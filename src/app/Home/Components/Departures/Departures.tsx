@@ -1,37 +1,19 @@
-import { Container, Icon, Text, Box, Spinner } from "@chakra-ui/react";
-
 import { useEffect, useState } from "react";
+import { Container, Icon, Text, Box, Spinner } from "@chakra-ui/react";
 import { TbBus } from "react-icons/tb";
+import { EstimatedCallsData, ResponseData } from "../Models/Types";
 
-const Departures = (data: any) => {
-  const [expectedDepartureTime, setIsExpectedDepartureTime] = useState<
-    number[]
-  >([]);
-  const [aimedDepartureTime, setIsAimedDepartureTime] = useState<number[]>([]);
+const Departures = (data: ResponseData) => {
   const [date, setDate] = useState<string>("");
 
-  let aimedTime: number[] = [];
-  let expectedTime: number[] = [];
-
-  const handleIfItsDelayed = () => {
-    data.data.estimatedCalls.map(
-      (response: any) => (
-        setDate(response.date),
-        aimedTime.push(response.expectedDepartureTime),
-        expectedTime.push(response.aimedDepartureTime),
-        setIsAimedDepartureTime(aimedTime),
-        setIsExpectedDepartureTime(expectedTime),
-        localStorage.setItem(
-          "aimedTime",
-          JSON.stringify(expectedDepartureTime)
-        ),
-        localStorage.setItem("expectedTime", JSON.stringify(aimedDepartureTime))
-      )
+  const getDate = () => {
+    data.stopPlace.estimatedCalls.map((response: EstimatedCallsData) =>
+      setDate(response.date)
     );
   };
 
   useEffect(() => {
-    handleIfItsDelayed();
+    getDate();
   }, []);
 
   return (
@@ -45,29 +27,20 @@ const Departures = (data: any) => {
         borderRadius={"6px"}
       >
         <Text textAlign={"left"} margin={"8px"}>
-          From <Text as={"b"}>{data.data.name}</Text>
+          From <Text as={"b"}>{data.stopPlace.name}</Text>
         </Text>
         <Text textAlign={"left"} marginLeft={"16px"}>
           {date}
         </Text>
 
         {data ? (
-          data.data.estimatedCalls.map((res: any, index: number) => {
-            let departureTime = new Date(res.expectedDepartureTime);
-            let delayedTime = new Date(res.aimedDepartureTime);
-            let departureHour = departureTime.getHours();
-            let departureMinutes = String(departureTime.getMinutes()).padStart(
-              2,
-              "0"
-            );
-            let delayedHours = departureTime.getHours();
-            let delayedMinutes = String(delayedTime.getMinutes()).padStart(
-              2,
-              "0"
-            );
-            return (
-              <Box key={index}>
-                {expectedDepartureTime[index] > aimedDepartureTime[index] ? (
+          data.stopPlace.estimatedCalls.map(
+            (res: EstimatedCallsData, index: number) => {
+              //Formatting the timestamp
+              let arrivedTime = new Date(res.expectedArrivalTime);
+              let shouldArrive = new Date(res.aimedArrivalTime);
+              return (
+                <Box key={index}>
                   <Box key={index}>
                     <Box margin={"8px"} display={"flex"} flexDirection={"row"}>
                       <Box
@@ -78,13 +51,28 @@ const Departures = (data: any) => {
                         borderRadius={"6px"}
                         flexDirection={"row"}
                       >
-                        <Text
-                          textDecorationLine={"line-through"}
-                        >{`${departureHour} : ${departureMinutes}`}</Text>
+                        {arrivedTime.setSeconds(0, 0) >
+                        shouldArrive.setSeconds(0, 0) ? (
+                          <>
+                            <Text textDecorationLine={"line-through"}>
+                              {`${shouldArrive.getHours()} : ${String(
+                                shouldArrive.getMinutes()
+                              ).padStart(2, "0")}`}
+                            </Text>
 
-                        <Text color={"red.600"} marginLeft={"8px"}>
-                          {`${delayedHours} : ${delayedMinutes}`}
-                        </Text>
+                            <Text color={"red.600"} marginLeft={"8px"}>
+                              {`${arrivedTime.getHours()} : ${String(
+                                arrivedTime.getMinutes()
+                              ).padStart(2, "0")}`}
+                            </Text>
+                          </>
+                        ) : (
+                          <Text>
+                            {`${shouldArrive.getHours()} : ${String(
+                              shouldArrive.getMinutes()
+                            ).padStart(2, "0")}`}
+                          </Text>
+                        )}
                       </Box>
                       <Box
                         bgColor={"red.200"}
@@ -104,41 +92,10 @@ const Departures = (data: any) => {
                       </Box>
                     </Box>
                   </Box>
-                ) : (
-                  <Box key={index}>
-                    <Box margin={"8px"} display={"flex"} flexDirection={"row"}>
-                      <Box
-                        bgColor={"blue.200"}
-                        display={"flex"}
-                        padding={"8px"}
-                        margin={"8px"}
-                        borderRadius={"6px"}
-                        flexDirection={"row"}
-                      >
-                        <Text>{`${departureHour} : ${departureMinutes}`}</Text>
-                      </Box>
-                      <Box
-                        bgColor={"red.200"}
-                        display={"flex"}
-                        margin={"8px"}
-                        padding={"8px"}
-                        borderRadius={"6px"}
-                        flexDirection={"row"}
-                      >
-                        <Text>{res.destinationDisplay.frontText} </Text>
-                        <Icon
-                          as={TbBus}
-                          width={6}
-                          height={6}
-                          marginLeft={"12px"}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            );
-          })
+                </Box>
+              );
+            }
+          )
         ) : (
           <Box>
             <Text>Trying to refecth data</Text>
