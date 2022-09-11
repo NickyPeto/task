@@ -1,8 +1,8 @@
 import { Box, Container, Heading, Icon, Text } from "@chakra-ui/react";
-import Departures from "./Departures/Departures";
+import Departures from "./DepartureBoard/Departures";
 import RefreshButton from "./RefreshButton/RefreshButton";
 import { TiArrowRightThick } from "react-icons/ti";
-import { QueryData } from "./Models/Types";
+import { QueryData } from "../Models/Types";
 
 const ContainerComponent = (data: QueryData) => {
   return (
