@@ -1,48 +1,60 @@
-import { useQuery } from "@apollo/client";
-import { Container } from "@chakra-ui/react";
+import { NetworkStatus, useQuery } from "@apollo/client";
+import { Box, Container, Text, Spinner } from "@chakra-ui/react";
 import { GET_SCHEDULES } from "./query";
 import { Button } from "@chakra-ui/react";
-import Arrivals from "./Arrivals/Arrivals";
-import Departures from "./Departures/Departures";
 import { useState } from "react";
 import { accentPalette } from "../styles/palettes";
+import ContainerComponent from "./Components/ContainerComponent";
+import { sample } from "lodash";
+import RefreshButton from "./Components/RefreshButton/RefreshButton";
 
 const Home = () => {
-  const [show, setShow] = useState(false);
-  const { loading, error, data } = useQuery(GET_SCHEDULES);
+  const [abortRef, setAbortRef] = useState(new AbortController());
+  const { loading, error, data, refetch, networkStatus } = useQuery(
+    GET_SCHEDULES,
+    {
+      variables: {
+        busId: "NSR:StopPlace:4000",
+      },
+      fetchPolicy: "network-only",
+      context: {
+        fetchOptions: abortRef.signal,
+      },
+      notifyOnNetworkStatusChange: true,
+    }
+  );
 
+  const timeout = sample([0, 200, 500, 700, 1000, 3000]);
+  const shouldThrow = sample([true, false, false, false]);
+
+  const props = {
+    data: data,
+    loading: loading,
+    networkStatus: networkStatus,
+    abortRef: abortRef.signal,
+    refetch: refetch,
+  };
+
+  if (networkStatus === NetworkStatus.refetch) return <p>Refetching!</p>;
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  const toggleButtons = (component: any) => {
-    return setShow((current) => !current);
-  };
-
   return (
-    <Container maxWidth={"100%"} display={"flex"} flexDirection={"column"}>
-      From <strong>{data.stopPlace.name}</strong>
-      <Button
-        size="md"
-        width={"120px"}
-        colorScheme={"orange"}
-        backgroundColor={"purple.500"}
-        onClick={toggleButtons}
-      >
-        Arrivals
-      </Button>
-      <Button
-        size="md"
-        width={"120px"}
-        colorScheme={"orange"}
-        backgroundColor={"purple.500"}
-        onClick={toggleButtons}
-      >
-        Departures
-      </Button>
-      {show ? (
-        <Arrivals data={data.stopPlace.estimatedCalls} />
+    <Container
+      height={"100%"}
+      padding={"0"}
+      width={"100%"}
+      maxWidth={"100%"}
+      display={"flex"}
+      flexDirection={"column"}
+    >
+      {data && !loading ? (
+        <ContainerComponent {...props} />
       ) : (
-        <Departures data={data.stopPlace.estimatedCalls} />
+        <Box>
+          <Text>Trying to refecth data</Text>
+          <Spinner size="xl" color={"blue.600"} />
+        </Box>
       )}
     </Container>
   );
