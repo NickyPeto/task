@@ -1,20 +1,10 @@
-import { OperationVariables, useQuery } from "@apollo/client";
-import { Box, Button, Container, Heading, Icon, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import Arrivals from "./Arrivals/Arrivals";
+import { Box, Container, Heading, Icon, Text } from "@chakra-ui/react";
 import Departures from "./Departures/Departures";
-import { GET_SCHEDULES } from "../query";
 import RefreshButton from "./RefreshButton/RefreshButton";
-import { TiArrowLeftThick, TiArrowRightThick } from "react-icons/ti";
+import { TiArrowRightThick } from "react-icons/ti";
+import { QueryData } from "./Models/Types";
 
-const ContainerComponent = (data: any) => {
-  //   const [abortRef, setAbortRef] = useState(new AbortController());
-  const [show, setShow] = useState<boolean>(false);
-  const [datas, setDatas] = useState<any[]>([]);
-
-  const toggleButtons = () => {
-    return setShow((current: boolean) => !current);
-  };
+const ContainerComponent = (data: QueryData) => {
   return (
     <Box
       justifyContent={"center"}
@@ -46,57 +36,23 @@ const ContainerComponent = (data: any) => {
         </Box>
       </Container>
 
-      {show ? (
-        <Container>
-          <Box
-            as="button"
-            margin={"16px"}
-            display={"flex"}
-            width={"120px"}
-            height={"40px"}
-            backgroundColor={"red.300"}
-            marginRight={"8px"}
-            borderRadius={"4px"}
-            justifyContent={"center"}
-            onClick={toggleButtons}
-          >
-            <Text alignSelf={"center"}>
-              Arrivals
-              <Icon
-                marginLeft={"8px"}
-                marginTop={"4px"}
-                size={2}
-                as={TiArrowLeftThick}
-              />
-            </Text>
-          </Box>
-          <Arrivals data={data.data.stopPlace} />
-        </Container>
-      ) : (
-        <Container>
-          <Box
-            margin={"16px"}
-            display={"flex"}
-            as="button"
-            width={"120px"}
-            height={"40px"}
-            backgroundColor={"red.300"}
-            borderRadius={"4px"}
-            justifyContent={"center"}
-            onClick={toggleButtons}
-          >
-            <Text alignSelf={"center"}>
-              Departures
-              <Icon
-                marginLeft={"8px"}
-                marginTop={"4px"}
-                as={TiArrowRightThick}
-              />
-            </Text>
-          </Box>
-          <Departures data={data.data.stopPlace} />
-        </Container>
-      )}
+      <Container>
+        <Box
+          margin={"16px"}
+          display={"flex"}
+          width={"120px"}
+          height={"40px"}
+          backgroundColor={"red.300"}
+          borderRadius={"4px"}
+          justifyContent={"center"}
+        >
+          <Text alignSelf={"center"}>
+            Departures
+            <Icon marginLeft={"8px"} marginTop={"4px"} as={TiArrowRightThick} />
+          </Text>
+        </Box>
+        <Departures {...data.data} />
+      </Container>
     </Box>
   );
 };

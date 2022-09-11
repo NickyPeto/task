@@ -1,38 +1,37 @@
-import { NetworkStatus, useQuery } from "@apollo/client";
+import { NetworkStatus, OperationVariables, useQuery } from "@apollo/client";
 import { Box, Container, Text, Spinner } from "@chakra-ui/react";
 import { GET_SCHEDULES } from "./query";
-import { Button } from "@chakra-ui/react";
 import { useState } from "react";
-import { accentPalette } from "../styles/palettes";
 import ContainerComponent from "./Components/ContainerComponent";
 import { sample } from "lodash";
-import RefreshButton from "./Components/RefreshButton/RefreshButton";
+import { QueryData } from "./Components/Models/Types";
 
 const Home = () => {
-  const [abortRef, setAbortRef] = useState(new AbortController());
-  const { loading, error, data, refetch, networkStatus } = useQuery(
-    GET_SCHEDULES,
-    {
-      variables: {
-        busId: "NSR:StopPlace:4000",
-      },
-      fetchPolicy: "network-only",
-      context: {
-        fetchOptions: abortRef.signal,
-      },
-      notifyOnNetworkStatusChange: true,
-    }
+  const [abortRef, setAbortRef] = useState<AbortController>(
+    new AbortController()
   );
+  const { loading, error, data, networkStatus } = useQuery<
+    any,
+    OperationVariables
+  >(GET_SCHEDULES, {
+    variables: {
+      busId: "NSR:StopPlace:4000",
+    },
+    fetchPolicy: "network-only",
+    context: {
+      fetchOptions: abortRef.signal,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
 
-  const timeout = sample([0, 200, 500, 700, 1000, 3000]);
-  const shouldThrow = sample([true, false, false, false]);
+  // const timeout = sample([0, 200, 500, 700, 1000, 3000]);
+  // const shouldThrow = sample([true, false, false, false]);
 
-  const props = {
+  const props: QueryData = {
+    abortRef: abortRef.signal,
     data: data,
     loading: loading,
     networkStatus: networkStatus,
-    abortRef: abortRef.signal,
-    refetch: refetch,
   };
 
   if (networkStatus === NetworkStatus.refetch) return <p>Refetching!</p>;

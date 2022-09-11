@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 
+//Query to be sent to the API.
 export const GET_SCHEDULES = gql`
   query departureBoard($busId: String!) {
     stopPlace(id: $busId) {
