@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_SCHEDULES = gql`
-  {
-    stopPlace(id: "NSR:StopPlace:4000") {
+  query departureBoard($busId: String!) {
+    stopPlace(id: $busId) {
       id
       name
       estimatedCalls(timeRange: 72100, numberOfDepartures: 10) {
