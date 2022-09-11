@@ -26,12 +26,10 @@ const RefreshButton = () => {
       },
     });
     if (loading) {
-      console.log("aborted");
       abortRef.abort();
       setAbortRef(new AbortController());
       return;
     }
-    console.log(data);
     refetch({ busId: busId });
   };
 
