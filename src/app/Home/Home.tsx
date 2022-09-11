@@ -3,8 +3,7 @@ import { Box, Container, Text, Spinner } from "@chakra-ui/react";
 import { GET_SCHEDULES } from "./query";
 import { useState } from "react";
 import ContainerComponent from "./Components/ContainerComponent";
-import { sample } from "lodash";
-import { QueryData } from "./Components/Models/Types";
+import { QueryData } from "./Models/Types";
 
 const Home = () => {
   const [abortRef, setAbortRef] = useState<AbortController>(
@@ -23,10 +22,6 @@ const Home = () => {
     },
     notifyOnNetworkStatusChange: true,
   });
-
-  // const timeout = sample([0, 200, 500, 700, 1000, 3000]);
-  // const shouldThrow = sample([true, false, false, false]);
-
   const props: QueryData = {
     abortRef: abortRef.signal,
     data: data,
@@ -34,9 +29,21 @@ const Home = () => {
     networkStatus: networkStatus,
   };
 
-  if (networkStatus === NetworkStatus.refetch) return <p>Refetching!</p>;
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  if (networkStatus === NetworkStatus.refetch)
+    return (
+      <Box>
+        <Text>Trying to refecth data</Text>
+        <Spinner size="xl" color={"blue.600"} />
+      </Box>
+    );
+  if (loading)
+    return (
+      <Box>
+        <Text>Loading</Text>
+        <Spinner size="xl" color={"blue.600"} />
+      </Box>
+    );
+  if (error) return <p>Error</p>;
 
   return (
     <Container
@@ -47,7 +54,7 @@ const Home = () => {
       display={"flex"}
       flexDirection={"column"}
     >
-      {data && !loading ? (
+      {data ? (
         <ContainerComponent {...props} />
       ) : (
         <Box>

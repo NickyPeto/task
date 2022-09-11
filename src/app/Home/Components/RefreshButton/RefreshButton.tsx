@@ -5,6 +5,7 @@ import { GET_SCHEDULES } from "../../query";
 
 const RefreshButton = () => {
   const [abortRef, setAbortRef] = useState(new AbortController());
+  //Using lazy query in order to execute queries in response to events besides component rendering
   const [refetchData, { loading, data, refetch }] = useLazyQuery(
     GET_SCHEDULES,
     {

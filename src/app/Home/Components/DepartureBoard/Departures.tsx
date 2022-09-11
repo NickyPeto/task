@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Container, Icon, Text, Box, Spinner } from "@chakra-ui/react";
 import { TbBus } from "react-icons/tb";
-import { EstimatedCallsData, ResponseData } from "../Models/Types";
+import { EstimatedCallsData, ResponseData } from "../../Models/Types";
 
 const Departures = (data: ResponseData) => {
   const [date, setDate] = useState<string>("");
 
   const getDate = () => {
+    //display date from the response
     data.stopPlace.estimatedCalls.map((response: EstimatedCallsData) =>
       setDate(response.date)
     );
@@ -98,7 +99,7 @@ const Departures = (data: ResponseData) => {
           )
         ) : (
           <Box>
-            <Text>Trying to refecth data</Text>
+            <Text>Trying to refetch data</Text>
             <Spinner size="xl" color={"blue.600"} />
           </Box>
         )}
